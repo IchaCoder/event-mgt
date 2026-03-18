@@ -55,7 +55,7 @@ export default function EarlyClassesPage() {
             >
               ← Back to Modules
             </Link>
-            <h1 className="text-3xl font-bold text-foreground">Early Classes Events Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">Ecole Nursery Events Dashboard</h1>
             <p className="mt-1 text-muted-foreground">Nursery and KG classes with boys and girls competitions</p>
           </div>
         </div>

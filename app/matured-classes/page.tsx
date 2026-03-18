@@ -56,7 +56,7 @@ export default function MaturedClassesPage() {
             >
               ← Back to Modules
             </Link>
-            <h1 className="text-3xl font-bold text-foreground">Matured Classes Events Dashboard</h1>
+            <h1 className="text-3xl font-bold text-foreground">Primary & Secondary Events Dashboard</h1>
             <p className="mt-1 text-muted-foreground">
               Upper Primary, Lower Primary and Secondary classes with boys and girls competitions
             </p>

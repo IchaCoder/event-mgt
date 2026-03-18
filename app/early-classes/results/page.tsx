@@ -38,7 +38,7 @@ export default function ResultsPage() {
       <header className="border-b border-border bg-card p-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Early Classes Results Board</h1>
+            <h1 className="text-3xl font-bold text-foreground">Ecole Nursery Results Board</h1>
             <p className="mt-1 text-muted-foreground">Total scores from all completed boys and girls competitions</p>
           </div>
         </div>
