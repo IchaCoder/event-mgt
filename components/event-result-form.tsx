@@ -1,165 +1,196 @@
 'use client';
 
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Event, Contestant, EventResult, calculatePoints } from '@/lib/data';
+import { Card } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { calculatePoints, type Contestant, type Event, type GenderCategory, type ScoredEventResult } from '@/lib/data';
 
 interface EventResultFormProps {
   event: Event;
+  gender: GenderCategory;
   contestants: Contestant[];
-  onSubmit: (result: EventResult & { cheetahsPoints: number; rhinosPoints: number }) => void;
+  existingResult?: ScoredEventResult;
+  module?: 'early' | 'matured';
+  allowTwoStudentMode?: boolean;
+  onSubmit: (result: ScoredEventResult) => void;
 }
 
-export function EventResultForm({ event, contestants, onSubmit }: EventResultFormProps) {
-  const [first, setFirst] = useState<string>('');
-  const [second, setSecond] = useState<string>('');
-  const [third, setThird] = useState<string>('');
-  const [submitted, setSubmitted] = useState(false);
+export function EventResultForm({
+  event,
+  gender,
+  contestants,
+  existingResult,
+  module = 'early',
+  allowTwoStudentMode = true,
+  onSubmit,
+}: EventResultFormProps) {
+  const [first, setFirst] = useState('');
+  const [second, setSecond] = useState('');
+  const [third, setThird] = useState('');
+  const [isTwoStudentMode, setIsTwoStudentMode] = useState(false);
+  const [saveMessageVisible, setSaveMessageVisible] = useState(false);
+
+  useEffect(() => {
+    if (!existingResult) {
+      setFirst('');
+      setSecond('');
+      setThird('');
+      setIsTwoStudentMode(false);
+      return;
+    }
+
+    setFirst(existingResult.placements.first);
+    setSecond(existingResult.placements.second);
+    setThird(existingResult.placements.third ?? '');
+    setIsTwoStudentMode(allowTwoStudentMode ? !existingResult.placements.third : false);
+  }, [allowTwoStudentMode, existingResult]);
 
   const handleSubmit = () => {
-    if (!first || !second || !third) {
-      alert('Please select all three placements');
+    const isTwoStudentActive = allowTwoStudentMode && isTwoStudentMode;
+    const requiresThirdPlace = !isTwoStudentActive;
+
+    if (!first || !second || (requiresThirdPlace && !third)) {
+      alert(requiresThirdPlace ? 'Please select 1st, 2nd and 3rd place.' : 'Please select 1st and 2nd place.');
       return;
     }
 
-    if (new Set([first, second, third]).size !== 3) {
-      alert('Each contestant can only place once');
+    const selectedPlacements = [first, second, third].filter(Boolean);
+    if (new Set(selectedPlacements).size !== selectedPlacements.length) {
+      alert('Each contestant can only appear once in placements.');
       return;
     }
 
+    if (isTwoStudentActive) {
+      const firstContestant = contestants.find((contestant) => contestant.id === first);
+      const secondContestant = contestants.find((contestant) => contestant.id === second);
+
+      if (!firstContestant || !secondContestant || firstContestant.group === secondContestant.group) {
+        alert('For 2-student competitions, select one Cheetahs contestant and one Rhinos contestant.');
+        return;
+      }
+    }
+
+    const normalizedThird = requiresThirdPlace ? third : undefined;
     const { cheetahsPoints, rhinosPoints } = calculatePoints(
-      { first, second, third },
-      event.className
+      { first, second, third: normalizedThird },
+      event.className,
+      gender,
+      module,
     );
 
     onSubmit({
       eventId: event.id,
       className: event.className,
       eventName: event.name,
-      placements: { first, second, third },
+      gender,
+      placements: { first, second, third: normalizedThird },
       cheetahsPoints,
       rhinosPoints,
     });
 
-    setSubmitted(true);
-    setFirst('');
-    setSecond('');
-    setThird('');
+    setSaveMessageVisible(true);
   };
 
-  const availableContestants = contestants.filter(c => 
-    c.id !== first && c.id !== second && c.id !== third
-  );
+  const genderLabel = gender === 'boys' ? 'Boys' : 'Girls';
+  const isTwoStudentActive = allowTwoStudentMode && isTwoStudentMode;
+  const canSubmit = isTwoStudentActive ? Boolean(first && second) : Boolean(first && second && third);
 
-  const getContestantColor = (groupName: string) => {
-    return groupName === 'Cheetahs' ? 'text-yellow-500' : 'text-purple-500';
+  const getGroupColor = (group: Contestant['group']) => (group === 'Cheetahs' ? 'text-amber-600' : 'text-slate-700');
+
+  const getContestantLabel = (contestant: Contestant) => {
+    const slotMatch = contestant.id.match(/-(\d+)$/);
+    const slot = slotMatch ? ` ${slotMatch[1]}` : '';
+    return `${contestant.group}${slot}`;
   };
-
-  if (submitted) {
-    const { cheetahsPoints, rhinosPoints } = calculatePoints(
-      { first, second, third },
-      event.className
-    );
-    const cheetahsName = contestants.find(c => c.id === first)?.name || '';
-    const rhinosName = contestants.find(c => c.id === second)?.name || '';
-
-    return (
-      <Card className="p-4 bg-card border-green-500/30">
-        <div className="space-y-2">
-          <h4 className="font-semibold text-foreground">{event.name}</h4>
-          <div className="text-sm space-y-1">
-            <p className="text-muted-foreground">
-              1st: <span className="text-foreground">{contestants.find(c => c.id === first)?.name}</span>
-            </p>
-            <p className="text-muted-foreground">
-              Points: Cheetahs <span className="text-yellow-500 font-bold">{cheetahsPoints}</span> | Rhinos <span className="text-purple-500 font-bold">{rhinosPoints}</span>
-            </p>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setSubmitted(false)}
-            className="mt-2"
-          >
-            Edit
-          </Button>
-        </div>
-      </Card>
-    );
-  }
 
   return (
-    <Card className="p-4 bg-card border-border">
-      <div className="space-y-4">
-        <h4 className="font-semibold text-foreground text-sm">{event.name}</h4>
+    <Card className="space-y-4 border-border p-4">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-semibold text-foreground">{genderLabel} Competition</h4>
+        <p className="text-xs text-muted-foreground">
+          {isTwoStudentActive ? '2 contestants (1 per team)' : '4 contestants (2 per team)'}
+        </p>
+      </div>
 
-        <div className="space-y-3">
-          <div className="space-y-2">
-            <label className="text-xs text-muted-foreground">1st Place</label>
-            <Select value={first} onValueChange={setFirst}>
-              <SelectTrigger className="bg-input text-foreground">
-                <SelectValue placeholder="Select contestant" />
-              </SelectTrigger>
-              <SelectContent>
-                {contestants.map(c => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} <span className={`ml-2 ${getContestantColor(c.group)}`}>({c.group})</span>
+      {allowTwoStudentMode && (
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <input
+            type="checkbox"
+            checked={isTwoStudentMode}
+            onChange={(event) => {
+              const nextMode = event.target.checked;
+              setIsTwoStudentMode(nextMode);
+              if (nextMode) {
+                setThird('');
+              }
+            }}
+          />
+          Only 2 students competing (1 Cheetahs + 1 Rhinos)
+        </label>
+      )}
+
+      <div className="space-y-3">
+        <div className="space-y-2">
+          <label className="text-xs text-muted-foreground">1st Place</label>
+          <Select value={first} onValueChange={setFirst}>
+            <SelectTrigger className="bg-input text-foreground">
+              <SelectValue placeholder="Select group" />
+            </SelectTrigger>
+            <SelectContent>
+              {contestants.map((contestant) => (
+                <SelectItem key={contestant.id} value={contestant.id}>
+                  <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs text-muted-foreground">2nd Place</label>
+          <Select value={second} onValueChange={setSecond}>
+            <SelectTrigger className="bg-input text-foreground">
+              <SelectValue placeholder="Select group" />
+            </SelectTrigger>
+            <SelectContent>
+              {contestants
+                .filter((contestant) => contestant.id !== first)
+                .map((contestant) => (
+                  <SelectItem key={contestant.id} value={contestant.id}>
+                    <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
+            </SelectContent>
+          </Select>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-xs text-muted-foreground">2nd Place</label>
-            <Select value={second} onValueChange={setSecond}>
-              <SelectTrigger className="bg-input text-foreground">
-                <SelectValue placeholder="Select contestant" />
-              </SelectTrigger>
-              <SelectContent>
-                {contestants.filter(c => c.id !== first).map(c => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} <span className={`ml-2 ${getContestantColor(c.group)}`}>({c.group})</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
+        {!isTwoStudentActive && (
           <div className="space-y-2">
             <label className="text-xs text-muted-foreground">3rd Place</label>
             <Select value={third} onValueChange={setThird}>
               <SelectTrigger className="bg-input text-foreground">
-                <SelectValue placeholder="Select contestant" />
+                <SelectValue placeholder="Select group" />
               </SelectTrigger>
               <SelectContent>
-                {contestants.filter(c => c.id !== first && c.id !== second).map(c => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name} <span className={`ml-2 ${getContestantColor(c.group)}`}>({c.group})</span>
-                  </SelectItem>
-                ))}
+                {contestants
+                  .filter((contestant) => contestant.id !== first && contestant.id !== second)
+                  .map((contestant) => (
+                    <SelectItem key={contestant.id} value={contestant.id}>
+                      <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>
-        </div>
-
-        <Button
-          onClick={handleSubmit}
-          disabled={!first || !second || !third}
-          className="w-full"
-          size="sm"
-        >
-          Submit Result
-        </Button>
+        )}
       </div>
+
+      <Button onClick={handleSubmit} disabled={!canSubmit} className="w-full" size="sm">
+        {existingResult ? 'Update Result' : 'Save Result'}
+      </Button>
+
+      {saveMessageVisible && <p className="text-xs text-emerald-600">Result saved. Team points updated.</p>}
     </Card>
   );
 }

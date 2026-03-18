@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 
-export default function Home() {
+export default function ChooseModule() {
   return (
     <main className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="max-w-4xl w-full space-y-12">
@@ -14,12 +14,12 @@ export default function Home() {
             <Image src={'/ronsard.png'} alt="Ronsard Logo" width={150} height={80} className="mx-auto" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-foreground">School Sports Event Manager</h1>
-          <p className="text-xl text-muted-foreground">Select a module to manage class competitions</p>
+          <p className="text-xl text-muted-foreground">Select a module to view competition results</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Early Classes Module */}
-          <Link href="/early-classes">
+          <Link href="/early-classes/results">
             <Card className="h-full p-8 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/50 bg-card">
               <div className="space-y-6 h-full flex flex-col justify-between">
                 <div className="space-y-4">
@@ -51,7 +51,7 @@ export default function Home() {
           </Link>
 
           {/* Matured Classes Module */}
-          <Link href="/matured-classes">
+          <Link href="/matured-classes/results">
             <Card className="h-full p-8 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/50 bg-card">
               <div className="space-y-6 h-full flex flex-col justify-between">
                 <div className="space-y-4">

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 
 interface LeaderboardCardProps {
@@ -10,45 +11,35 @@ interface LeaderboardCardProps {
 
 export function LeaderboardCard({ group, points, rank = 'tied' }: LeaderboardCardProps) {
   const isCheetahs = group === 'Cheetahs';
-  const bgGradient = isCheetahs
-    ? 'from-yellow-500/10 to-orange-500/10'
-    : 'from-purple-500/10 to-pink-500/10';
-  const borderColor = isCheetahs ? 'border-yellow-500/30' : 'border-purple-500/30';
-  const textColor = isCheetahs ? 'text-yellow-500' : 'text-purple-500';
-  const emoji = isCheetahs ? '🐆' : '🦏';
+  const logoSrc = isCheetahs ? '/teams/cheetahs.png' : '/teams/rhinos.png';
+  const accentClass = isCheetahs ? 'text-amber-600' : 'text-orange-700';
+  const borderClass = isCheetahs ? 'border-amber-200' : 'border-orange-200';
+  const backgroundClass = isCheetahs
+    ? 'from-amber-50 via-white to-amber-100'
+    : 'from-orange-50 via-white to-orange-100';
 
-  let rankIcon = '';
-  let rankText = '';
-  if (rank === 'first') {
-    rankIcon = '👑';
-    rankText = 'Winning';
-  } else if (rank === 'second') {
-    rankIcon = '🥈';
-    rankText = 'Second';
-  } else {
-    rankIcon = '⚖️';
-    rankText = 'Tied';
-  }
+  const rankLabel = rank === 'first' ? 'Leading' : rank === 'second' ? 'Runner-up' : 'Level Score';
 
   return (
-    <Card className={`relative overflow-hidden bg-gradient-to-br ${bgGradient} border-2 ${borderColor} p-8 h-full flex flex-col justify-between`}>
-      <div className="absolute top-0 right-0 text-6xl opacity-20 select-none">
-        {emoji}
-      </div>
-
-      <div className="space-y-2 relative z-10">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl">{rankIcon}</span>
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-            {rankText}
-          </span>
+    <Card className={`border-2 ${borderClass} bg-linear-to-br ${backgroundClass} h-full overflow-hidden p-6`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{rankLabel}</p>
+          <h3 className={`text-3xl font-black ${accentClass}`}>{group}</h3>
+          <p className="text-sm text-muted-foreground">Total Points</p>
+          <p className={`text-5xl font-black ${accentClass}`}>{points}</p>
         </div>
-        <h3 className={`text-3xl font-bold ${textColor}`}>{group}</h3>
-      </div>
 
-      <div className="relative z-10">
-        <p className="text-muted-foreground text-sm mb-1">Total Points</p>
-        <p className={`text-5xl font-black ${textColor}`}>{points}</p>
+        <div className="rounded-xl bg-white/85 p-2 shadow-sm">
+          <Image
+            src={logoSrc}
+            alt={`${group} logo`}
+            width={110}
+            height={110}
+            className="h-20 w-20 object-contain md:h-24 md:w-24"
+            priority
+          />
+        </div>
       </div>
     </Card>
   );

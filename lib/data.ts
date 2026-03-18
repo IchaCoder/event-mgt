@@ -1,20 +1,9 @@
-// Data types for the sports event management system
+export type TeamName = 'Cheetahs' | 'Rhinos';
+export type GenderCategory = 'boys' | 'girls';
 
 export interface Contestant {
   id: string;
-  name: string;
-  group: 'Cheetahs' | 'Rhinos';
-}
-
-export interface EventResult {
-  eventId: string;
-  className: string;
-  eventName: string;
-  placements: {
-    first: string; // contestant id
-    second: string; // contestant id
-    third: string; // contestant id
-  };
+  group: TeamName;
 }
 
 export interface Event {
@@ -27,147 +16,205 @@ export interface Class {
   id: string;
   name: string;
   module: 'early' | 'matured';
-  color: string;
 }
 
-// Early classes
+export interface EventResult {
+  eventId: string;
+  className: string;
+  eventName: string;
+  gender: GenderCategory;
+  placements: {
+    first: string;
+    second: string;
+    third?: string;
+  };
+}
+
+export interface ScoredEventResult extends EventResult {
+  cheetahsPoints: number;
+  rhinosPoints: number;
+}
+
 export const EARLY_CLASSES: Class[] = [
-  { id: 'apple', name: 'Apple', module: 'early', color: 'from-red-500 to-red-600' },
-  { id: 'emerald', name: 'Emerald Green', module: 'early', color: 'from-emerald-500 to-emerald-600' },
-  { id: 'red', name: 'Red', module: 'early', color: 'from-rose-500 to-rose-600' },
-  { id: 'yellow', name: 'Yellow', module: 'early', color: 'from-yellow-400 to-yellow-500' },
+  { id: 'apple', name: 'Apple', module: 'early' },
+  { id: 'emerald', name: 'Emerald Green', module: 'early' },
+  { id: 'red', name: 'Red', module: 'early' },
+  { id: 'yellow', name: 'Yellow', module: 'early' },
 ];
 
-// Matured classes
 export const MATURED_CLASSES: Class[] = [
-  { id: 'primary', name: 'Primary', module: 'matured', color: 'from-blue-500 to-blue-600' },
-  { id: 'secondary', name: 'Secondary', module: 'matured', color: 'from-purple-500 to-purple-600' },
+  { id: 'year-1', name: 'Year 1', module: 'matured' },
+  { id: 'year-2', name: 'Year 2', module: 'matured' },
+  { id: 'year-3', name: 'Year 3', module: 'matured' },
+  { id: 'year-4', name: 'Year 4', module: 'matured' },
+  { id: 'year-5', name: 'Year 5', module: 'matured' },
+  { id: 'year-6', name: 'Year 6', module: 'matured' },
+  { id: 'lower-primary', name: 'Lower Primary', module: 'matured' },
+  { id: 'upper-primary', name: 'Upper Primary', module: 'matured' },
+  { id: 'secondary', name: 'Secondary', module: 'matured' },
 ];
 
-// Events for each early class
+const MATURED_DASH_CLASSES = ['year-1', 'year-2', 'year-3', 'year-4', 'year-5', 'year-6', 'secondary'] as const;
+const MATURED_CAPTURE_CLASSES = ['year-1', 'year-2', 'year-3', 'year-4', 'year-5', 'year-6', 'secondary'] as const;
+const MATURED_RELAY_CLASSES = ['upper-primary', 'lower-primary', 'secondary'] as const;
+
+export const MATURED_EVENTS: Event[] = [
+  ...MATURED_DASH_CLASSES.map((className) => ({
+    id: `${className}-50m-dash`,
+    name: '50m Dash',
+    className,
+  })),
+  ...MATURED_CAPTURE_CLASSES.map((className) => ({
+    id: `${className}-capture-the-ball`,
+    name: 'Capture the Ball',
+    className,
+  })),
+  ...MATURED_RELAY_CLASSES.map((className) => ({
+    id: `${className}-4x50m-relay`,
+    name: '4 x 50m Relay',
+    className,
+  })),
+];
+
 export const EARLY_EVENTS: Event[] = [
-  // Apple class events
-  { id: 'apple-100m', name: '100m Sprint', className: 'apple' },
-  { id: 'apple-relay', name: '4x100m Relay', className: 'apple' },
-  { id: 'apple-jump', name: 'Long Jump', className: 'apple' },
-  { id: 'apple-throw', name: 'Shot Put', className: 'apple' },
-  
-  // Emerald Green class events
-  { id: 'emerald-100m', name: '100m Sprint', className: 'emerald' },
-  { id: 'emerald-relay', name: '4x100m Relay', className: 'emerald' },
-  { id: 'emerald-jump', name: 'Long Jump', className: 'emerald' },
-  { id: 'emerald-throw', name: 'Shot Put', className: 'emerald' },
-  
-  // Red class events
-  { id: 'red-100m', name: '100m Sprint', className: 'red' },
-  { id: 'red-relay', name: '4x100m Relay', className: 'red' },
-  { id: 'red-jump', name: 'Long Jump', className: 'red' },
-  { id: 'red-throw', name: 'Shot Put', className: 'red' },
-  
-  // Yellow class events
-  { id: 'yellow-100m', name: '100m Sprint', className: 'yellow' },
-  { id: 'yellow-relay', name: '4x100m Relay', className: 'yellow' },
-  { id: 'yellow-jump', name: 'Long Jump', className: 'yellow' },
-  { id: 'yellow-throw', name: 'Shot Put', className: 'yellow' },
+  { id: 'apple-ball-race', name: 'Ball Race', className: 'apple' },
+
+  { id: 'emerald-hoop-pulling', name: 'Hoop Pulling', className: 'emerald' },
+  { id: 'emerald-20m-dash', name: '20m Dash', className: 'emerald' },
+  { id: 'emerald-football-shooting', name: 'Football Shooting', className: 'emerald' },
+
+  { id: 'red-hoop-pulling', name: 'Hoop Pulling', className: 'red' },
+  { id: 'red-ice-cream-race', name: 'Ice Cream Race', className: 'red' },
+  { id: 'red-20m-dash', name: '20m Dash', className: 'red' },
+  { id: 'red-football-shooting', name: 'Football Shooting', className: 'red' },
+
+  { id: 'yellow-hoop-pulling', name: 'Hoop Pulling', className: 'yellow' },
+  { id: 'yellow-ice-cream-race', name: 'Ice Cream Race', className: 'yellow' },
+  { id: 'yellow-20m-dash', name: '20m Dash', className: 'yellow' },
+  { id: 'yellow-football-shooting', name: 'Football Shooting', className: 'yellow' },
 ];
 
-// Generate sample contestants for early classes
-function generateContestants(className: string): Contestant[] {
-  const firstNames = ['Alex', 'Jordan', 'Casey', 'Morgan', 'Taylor', 'Riley', 'Cameron', 'Parker'];
-  const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis'];
-  
-  const contestants: Contestant[] = [];
-  let groupIndex = 0;
-  
-  for (let i = 0; i < 8; i++) {
-    contestants.push({
-      id: `${className}-contestant-${i}`,
-      name: `${firstNames[i % firstNames.length]} ${lastNames[Math.floor(i / firstNames.length)]}`,
-      group: groupIndex % 2 === 0 ? 'Cheetahs' : 'Rhinos',
-    });
-    groupIndex++;
-  }
-  
-  return contestants;
+function createCompetitionContestants(className: string, gender: GenderCategory): Contestant[] {
+  return [
+    { id: `${className}-${gender}-cheetahs-1`, group: 'Cheetahs' },
+    { id: `${className}-${gender}-cheetahs-2`, group: 'Cheetahs' },
+    { id: `${className}-${gender}-rhinos-1`, group: 'Rhinos' },
+    { id: `${className}-${gender}-rhinos-2`, group: 'Rhinos' },
+  ];
 }
 
-// All contestants for early classes
-export const EARLY_CONTESTANTS: { [key: string]: Contestant[] } = {
-  apple: generateContestants('apple'),
-  emerald: generateContestants('emerald'),
-  red: generateContestants('red'),
-  yellow: generateContestants('yellow'),
+export const EARLY_CONTESTANTS: Record<string, Record<GenderCategory, Contestant[]>> = {
+  apple: {
+    boys: createCompetitionContestants('apple', 'boys'),
+    girls: createCompetitionContestants('apple', 'girls'),
+  },
+  emerald: {
+    boys: createCompetitionContestants('emerald', 'boys'),
+    girls: createCompetitionContestants('emerald', 'girls'),
+  },
+  red: {
+    boys: createCompetitionContestants('red', 'boys'),
+    girls: createCompetitionContestants('red', 'girls'),
+  },
+  yellow: {
+    boys: createCompetitionContestants('yellow', 'boys'),
+    girls: createCompetitionContestants('yellow', 'girls'),
+  },
 };
 
-// Scoring system: 1st place = 6 points, 2nd = 4 points, 3rd = 2 points
+const maturedClassIds = MATURED_CLASSES.map((cls) => cls.id);
+
+export const MATURED_CONTESTANTS: Record<string, Record<GenderCategory, Contestant[]>> = Object.fromEntries(
+  maturedClassIds.map((classId) => [
+    classId,
+    {
+      boys: createCompetitionContestants(classId, 'boys'),
+      girls: createCompetitionContestants(classId, 'girls'),
+    },
+  ]),
+) as Record<string, Record<GenderCategory, Contestant[]>>;
+
 export const POINTS_FOR_PLACEMENT = {
   first: 6,
   second: 4,
   third: 2,
-};
+} as const;
 
-// Utility functions
 export function getClassById(classId: string, module: 'early' | 'matured' = 'early'): Class | undefined {
   const classes = module === 'early' ? EARLY_CLASSES : MATURED_CLASSES;
-  return classes.find(c => c.id === classId);
+  return classes.find((cls) => cls.id === classId);
 }
 
-export function getContestantName(classId: string, contestantId: string): string {
-  const contestant = EARLY_CONTESTANTS[classId]?.find(c => c.id === contestantId);
-  return contestant?.name || 'Unknown';
+export function getCompetitionKey(eventId: string, gender: GenderCategory): string {
+  return `${eventId}-${gender}`;
+}
+
+export function getContestantsForCompetition(
+  classId: string,
+  gender: GenderCategory,
+  module: 'early' | 'matured' = 'early',
+): Contestant[] {
+  const contestantMap = module === 'early' ? EARLY_CONTESTANTS : MATURED_CONTESTANTS;
+  return contestantMap[classId]?.[gender] ?? [];
+}
+
+export function getContestantById(
+  classId: string,
+  gender: GenderCategory,
+  contestantId?: string,
+  module: 'early' | 'matured' = 'early',
+): Contestant | undefined {
+  if (!contestantId) {
+    return undefined;
+  }
+
+  return getContestantsForCompetition(classId, gender, module).find((contestant) => contestant.id === contestantId);
 }
 
 export function calculatePoints(
-  placements: { first: string; second: string; third: string },
-  classId: string
+  placements: { first: string; second: string; third?: string },
+  classId: string,
+  gender: GenderCategory,
+  module: 'early' | 'matured' = 'early',
 ): { cheetahsPoints: number; rhinosPoints: number } {
+  const contestants = getContestantsForCompetition(classId, gender, module);
+  const firstContestant = contestants.find((contestant) => contestant.id === placements.first);
+  const secondContestant = contestants.find((contestant) => contestant.id === placements.second);
+  const thirdContestant = placements.third
+    ? contestants.find((contestant) => contestant.id === placements.third)
+    : undefined;
+
   let cheetahsPoints = 0;
   let rhinosPoints = 0;
 
-  const contestants = EARLY_CONTESTANTS[classId] || [];
-  const firstContestant = contestants.find(c => c.id === placements.first);
-  const secondContestant = contestants.find(c => c.id === placements.second);
-  const thirdContestant = contestants.find(c => c.id === placements.third);
+  if (firstContestant?.group === 'Cheetahs') cheetahsPoints += POINTS_FOR_PLACEMENT.first;
+  if (firstContestant?.group === 'Rhinos') rhinosPoints += POINTS_FOR_PLACEMENT.first;
 
-  if (firstContestant) {
-    if (firstContestant.group === 'Cheetahs') {
-      cheetahsPoints += POINTS_FOR_PLACEMENT.first;
-    } else {
-      rhinosPoints += POINTS_FOR_PLACEMENT.first;
-    }
-  }
+  if (secondContestant?.group === 'Cheetahs') cheetahsPoints += POINTS_FOR_PLACEMENT.second;
+  if (secondContestant?.group === 'Rhinos') rhinosPoints += POINTS_FOR_PLACEMENT.second;
 
-  if (secondContestant) {
-    if (secondContestant.group === 'Cheetahs') {
-      cheetahsPoints += POINTS_FOR_PLACEMENT.second;
-    } else {
-      rhinosPoints += POINTS_FOR_PLACEMENT.second;
-    }
-  }
-
-  if (thirdContestant) {
-    if (thirdContestant.group === 'Cheetahs') {
-      cheetahsPoints += POINTS_FOR_PLACEMENT.third;
-    } else {
-      rhinosPoints += POINTS_FOR_PLACEMENT.third;
-    }
-  }
+  if (thirdContestant?.group === 'Cheetahs') cheetahsPoints += POINTS_FOR_PLACEMENT.third;
+  if (thirdContestant?.group === 'Rhinos') rhinosPoints += POINTS_FOR_PLACEMENT.third;
 
   return { cheetahsPoints, rhinosPoints };
 }
 
-export function calculateTotalPoints(
-  results: EventResult[],
-  module: 'early' | 'matured' = 'early'
-): { cheetahsTotal: number; rhinosTotal: number } {
-  let cheetahsTotal = 0;
-  let rhinosTotal = 0;
+export function calculateTotalPoints(results: ScoredEventResult[]): {
+  cheetahsTotal: number;
+  rhinosTotal: number;
+} {
+  return results.reduce(
+    (totals, result) => {
+      totals.cheetahsTotal += result.cheetahsPoints;
+      totals.rhinosTotal += result.rhinosPoints;
+      return totals;
+    },
+    { cheetahsTotal: 0, rhinosTotal: 0 },
+  );
+}
 
-  results.forEach(result => {
-    const { cheetahsPoints, rhinosPoints } = calculatePoints(result.placements, result.className);
-    cheetahsTotal += cheetahsPoints;
-    rhinosTotal += rhinosPoints;
-  });
-
-  return { cheetahsTotal, rhinosTotal };
+export function getCompetitionCountForClass(classId: string, module: 'early' | 'matured' = 'early'): number {
+  const events = module === 'early' ? EARLY_EVENTS : MATURED_EVENTS;
+  const eventCount = events.filter((event) => event.className === classId).length;
+  return eventCount * 2;
 }
