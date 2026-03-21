@@ -141,7 +141,7 @@ export default function MaturedClassesPage() {
                             {GENDERS.map((gender) => {
                               const competitionKey = getEditingKey(event.id, gender);
                               const existingResult = getResult(event.id, gender);
-                              const contestants = getContestantsForCompetition(cls.id, gender, 'matured');
+                              const contestants = getContestantsForCompetition(cls.id, gender, 'matured', event.id);
 
                               if (!existingResult) {
                                 return (
@@ -161,18 +161,21 @@ export default function MaturedClassesPage() {
                                 gender,
                                 existingResult.placements.first,
                                 'matured',
+                                event.id,
                               );
                               const second = getContestantById(
                                 cls.id,
                                 gender,
                                 existingResult.placements.second,
                                 'matured',
+                                event.id,
                               );
                               const third = getContestantById(
                                 cls.id,
                                 gender,
                                 existingResult.placements.third,
                                 'matured',
+                                event.id,
                               );
 
                               return (
@@ -195,7 +198,7 @@ export default function MaturedClassesPage() {
                                   <p className="text-sm text-muted-foreground">
                                     3rd:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {third ? formatContestant(third.name, third.group) : 'Not used (2-student event)'}
+                                      {third ? formatContestant(third.name, third.group) : 'Not recorded'}
                                     </span>
                                   </p>
                                   <p className="text-sm font-semibold text-foreground">

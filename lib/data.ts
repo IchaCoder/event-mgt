@@ -80,22 +80,21 @@ export const MATURED_EVENTS: Event[] = [
 export const EARLY_EVENTS: Event[] = [
   { id: 'apple-ball-race', name: 'Ball Race', className: 'apple' },
 
-  { id: 'emerald-hoop-pulling', name: 'Hoop Pulling', className: 'emerald' },
   { id: 'emerald-20m-dash', name: '20m Dash', className: 'emerald' },
   { id: 'emerald-football-shooting', name: 'Football Shooting', className: 'emerald' },
 
-  { id: 'red-hoop-pulling', name: 'Hoop Pulling', className: 'red' },
   { id: 'red-ice-cream-race', name: 'Ice Cream Race', className: 'red' },
   { id: 'red-20m-dash', name: '20m Dash', className: 'red' },
   { id: 'red-football-shooting', name: 'Football Shooting', className: 'red' },
 
-  { id: 'yellow-hoop-pulling', name: 'Hoop Pulling', className: 'yellow' },
   { id: 'yellow-ice-cream-race', name: 'Ice Cream Race', className: 'yellow' },
   { id: 'yellow-20m-dash', name: '20m Dash', className: 'yellow' },
   { id: 'yellow-football-shooting', name: 'Football Shooting', className: 'yellow' },
 ];
 
-const DEFAULT_CONTESTANT_NAMES: Record<GenderCategory, Record<TeamName, [string, string]>> = {
+type TeamContestantNames = [string, string, ...string[]];
+
+const DEFAULT_CONTESTANT_NAMES: Record<GenderCategory, Record<TeamName, TeamContestantNames>> = {
   boys: {
     Cheetahs: ['Ethan', 'Liam'],
     Rhinos: ['Noah', 'Mason'],
@@ -106,7 +105,7 @@ const DEFAULT_CONTESTANT_NAMES: Record<GenderCategory, Record<TeamName, [string,
   },
 };
 
-const CONTESTANT_NAMES_BY_CLASS: Record<string, Record<GenderCategory, Record<TeamName, [string, string]>>> = {
+const CONTESTANT_NAMES_BY_CLASS: Record<string, Record<GenderCategory, Record<TeamName, TeamContestantNames>>> = {
   apple: {
     boys: { Cheetahs: ['Ethan', 'Luca'], Rhinos: ['Noah', 'Kai'] },
     girls: { Cheetahs: ['Ava', 'Mila'], Rhinos: ['Zoe', 'Nia'] },
@@ -161,15 +160,48 @@ const CONTESTANT_NAMES_BY_CLASS: Record<string, Record<GenderCategory, Record<Te
   },
 };
 
-function createCompetitionContestants(className: string, gender: GenderCategory): Contestant[] {
+const EXTRA_CONTESTANT_NAMES: Record<GenderCategory, Record<TeamName, string[]>> = {
+  boys: {
+    Cheetahs: ['Kian', 'Ruben', 'Asher', 'Nolan'],
+    Rhinos: ['Jasper', 'Miles', 'Evan', 'Logan'],
+  },
+  girls: {
+    Cheetahs: ['Ayla', 'Nora', 'Lila', 'Mina'],
+    Rhinos: ['Thea', 'Mira', 'Cora', 'Rina'],
+  },
+};
+
+function getFourContestantNames(
+  className: string,
+  gender: GenderCategory,
+  team: TeamName,
+): [string, string, string, string] {
   const namesByGroupAndGender = CONTESTANT_NAMES_BY_CLASS[className] ?? DEFAULT_CONTESTANT_NAMES;
-  const names = namesByGroupAndGender[gender];
+  const baseNames = namesByGroupAndGender[gender][team];
+  const mergedNames = [...baseNames, ...EXTRA_CONTESTANT_NAMES[gender][team]];
+  const uniqueNames = Array.from(new Set(mergedNames)).slice(0, 4);
 
   return [
-    { id: `${className}-${gender}-cheetahs-1`, name: names.Cheetahs[0], group: 'Cheetahs' },
-    { id: `${className}-${gender}-cheetahs-2`, name: names.Cheetahs[1], group: 'Cheetahs' },
-    { id: `${className}-${gender}-rhinos-1`, name: names.Rhinos[0], group: 'Rhinos' },
-    { id: `${className}-${gender}-rhinos-2`, name: names.Rhinos[1], group: 'Rhinos' },
+    uniqueNames[0] ?? `${team} 1`,
+    uniqueNames[1] ?? `${team} 2`,
+    uniqueNames[2] ?? `${team} 3`,
+    uniqueNames[3] ?? `${team} 4`,
+  ];
+}
+
+function createCompetitionContestants(className: string, gender: GenderCategory): Contestant[] {
+  const cheetahsNames = getFourContestantNames(className, gender, 'Cheetahs');
+  const rhinosNames = getFourContestantNames(className, gender, 'Rhinos');
+
+  return [
+    { id: `${className}-${gender}-cheetahs-1`, name: cheetahsNames[0], group: 'Cheetahs' },
+    { id: `${className}-${gender}-cheetahs-2`, name: cheetahsNames[1], group: 'Cheetahs' },
+    { id: `${className}-${gender}-cheetahs-3`, name: cheetahsNames[2], group: 'Cheetahs' },
+    { id: `${className}-${gender}-cheetahs-4`, name: cheetahsNames[3], group: 'Cheetahs' },
+    { id: `${className}-${gender}-rhinos-1`, name: rhinosNames[0], group: 'Rhinos' },
+    { id: `${className}-${gender}-rhinos-2`, name: rhinosNames[1], group: 'Rhinos' },
+    { id: `${className}-${gender}-rhinos-3`, name: rhinosNames[2], group: 'Rhinos' },
+    { id: `${className}-${gender}-rhinos-4`, name: rhinosNames[3], group: 'Rhinos' },
   ];
 }
 
@@ -223,9 +255,21 @@ export function getContestantsForCompetition(
   classId: string,
   gender: GenderCategory,
   module: 'early' | 'matured' = 'early',
+  eventId?: string,
 ): Contestant[] {
   const contestantMap = module === 'early' ? EARLY_CONTESTANTS : MATURED_CONTESTANTS;
-  return contestantMap[classId]?.[gender] ?? [];
+  const allContestants = contestantMap[classId]?.[gender] ?? [];
+  const isRelayOrCaptureEvent = Boolean(eventId && (eventId.includes('relay') || eventId.includes('capture-the-ball')));
+  const contestantsPerGroup = isRelayOrCaptureEvent ? 4 : 3;
+
+  const cheetahsContestants = allContestants
+    .filter((contestant) => contestant.group === 'Cheetahs')
+    .slice(0, contestantsPerGroup);
+  const rhinosContestants = allContestants
+    .filter((contestant) => contestant.group === 'Rhinos')
+    .slice(0, contestantsPerGroup);
+
+  return [...cheetahsContestants, ...rhinosContestants];
 }
 
 export function getContestantById(
@@ -233,12 +277,15 @@ export function getContestantById(
   gender: GenderCategory,
   contestantId?: string,
   module: 'early' | 'matured' = 'early',
+  eventId?: string,
 ): Contestant | undefined {
   if (!contestantId) {
     return undefined;
   }
 
-  return getContestantsForCompetition(classId, gender, module).find((contestant) => contestant.id === contestantId);
+  return getContestantsForCompetition(classId, gender, module, eventId).find(
+    (contestant) => contestant.id === contestantId,
+  );
 }
 
 export function calculatePoints(
@@ -246,8 +293,9 @@ export function calculatePoints(
   classId: string,
   gender: GenderCategory,
   module: 'early' | 'matured' = 'early',
+  eventId?: string,
 ): { cheetahsPoints: number; rhinosPoints: number } {
-  const contestants = getContestantsForCompetition(classId, gender, module);
+  const contestants = getContestantsForCompetition(classId, gender, module, eventId);
   const firstContestant = contestants.find((contestant) => contestant.id === placements.first);
   const secondContestant = contestants.find((contestant) => contestant.id === placements.second);
   const thirdContestant = placements.third

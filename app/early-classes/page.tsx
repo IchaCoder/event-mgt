@@ -127,7 +127,7 @@ export default function EarlyClassesPage() {
                           {GENDERS.map((gender) => {
                             const competitionKey = getEditingKey(event.id, gender);
                             const existingResult = getResult(event.id, gender);
-                            const contestants = getContestantsForCompetition(cls.id, gender);
+                            const contestants = getContestantsForCompetition(cls.id, gender, 'early', event.id);
 
                             if (!existingResult) {
                               return (
@@ -141,9 +141,27 @@ export default function EarlyClassesPage() {
                               );
                             }
 
-                            const first = getContestantById(cls.id, gender, existingResult.placements.first);
-                            const second = getContestantById(cls.id, gender, existingResult.placements.second);
-                            const third = getContestantById(cls.id, gender, existingResult.placements.third);
+                            const first = getContestantById(
+                              cls.id,
+                              gender,
+                              existingResult.placements.first,
+                              'early',
+                              event.id,
+                            );
+                            const second = getContestantById(
+                              cls.id,
+                              gender,
+                              existingResult.placements.second,
+                              'early',
+                              event.id,
+                            );
+                            const third = getContestantById(
+                              cls.id,
+                              gender,
+                              existingResult.placements.third,
+                              'early',
+                              event.id,
+                            );
 
                             return (
                               <Card key={competitionKey} className="space-y-3 border-border p-4">
@@ -163,7 +181,7 @@ export default function EarlyClassesPage() {
                                 <p className="text-sm text-muted-foreground">
                                   3rd:{' '}
                                   <span className="font-semibold text-foreground">
-                                    {third ? formatContestant(third.name, third.group) : 'Not used (2-student event)'}
+                                    {third ? formatContestant(third.name, third.group) : 'Not recorded'}
                                   </span>
                                 </p>
                                 <p className="text-sm font-semibold text-foreground">

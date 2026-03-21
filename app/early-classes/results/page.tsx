@@ -133,9 +133,27 @@ export default function ResultsPage() {
                                 );
                               }
 
-                              const first = getContestantById(cls.id, gender, result.placements.first);
-                              const second = getContestantById(cls.id, gender, result.placements.second);
-                              const third = getContestantById(cls.id, gender, result.placements.third);
+                              const first = getContestantById(
+                                cls.id,
+                                gender,
+                                result.placements.first,
+                                'early',
+                                event.id,
+                              );
+                              const second = getContestantById(
+                                cls.id,
+                                gender,
+                                result.placements.second,
+                                'early',
+                                event.id,
+                              );
+                              const third = getContestantById(
+                                cls.id,
+                                gender,
+                                result.placements.third,
+                                'early',
+                                event.id,
+                              );
 
                               return (
                                 <Card key={`${event.id}-${gender}`} className="space-y-2 bg-card p-3">
@@ -157,7 +175,7 @@ export default function ResultsPage() {
                                   <p className="text-sm text-muted-foreground">
                                     3rd:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {third ? formatContestant(third.name, third.group) : 'Not used (2-student event)'}
+                                      {third ? formatContestant(third.name, third.group) : 'Not recorded'}
                                     </span>
                                   </p>
                                   <p className="text-sm font-semibold text-foreground">
