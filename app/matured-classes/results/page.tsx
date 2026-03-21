@@ -20,6 +20,10 @@ const GENDERS: GenderCategory[] = ['boys', 'girls'];
 
 export default function MaturedResultsPage() {
   const { results } = useMaturedResults();
+  const formatContestant = (name?: string, group?: string) => {
+    if (!name || !group) return 'N/A';
+    return `${name} (${group})`;
+  };
 
   const totals = useMemo(() => calculateTotalPoints(results), [results]);
 
@@ -151,15 +155,21 @@ export default function MaturedResultsPage() {
                                     {gender} Competition
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    1st: <span className="font-semibold text-foreground">{first?.group}</span>
+                                    1st:{' '}
+                                    <span className="font-semibold text-foreground">
+                                      {formatContestant(first?.name, first?.group)}
+                                    </span>
                                   </p>
                                   <p className="text-sm text-muted-foreground">
-                                    2nd: <span className="font-semibold text-foreground">{second?.group}</span>
+                                    2nd:{' '}
+                                    <span className="font-semibold text-foreground">
+                                      {formatContestant(second?.name, second?.group)}
+                                    </span>
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     3rd:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {third?.group ?? 'Not used (2-student event)'}
+                                      {third ? formatContestant(third.name, third.group) : 'Not used (2-student event)'}
                                     </span>
                                   </p>
                                   <p className="text-sm font-semibold text-foreground">

@@ -3,6 +3,7 @@ export type GenderCategory = 'boys' | 'girls';
 
 export interface Contestant {
   id: string;
+  name: string;
   group: TeamName;
 }
 
@@ -94,12 +95,81 @@ export const EARLY_EVENTS: Event[] = [
   { id: 'yellow-football-shooting', name: 'Football Shooting', className: 'yellow' },
 ];
 
+const DEFAULT_CONTESTANT_NAMES: Record<GenderCategory, Record<TeamName, [string, string]>> = {
+  boys: {
+    Cheetahs: ['Ethan', 'Liam'],
+    Rhinos: ['Noah', 'Mason'],
+  },
+  girls: {
+    Cheetahs: ['Ava', 'Mia'],
+    Rhinos: ['Zoe', 'Ella'],
+  },
+};
+
+const CONTESTANT_NAMES_BY_CLASS: Record<string, Record<GenderCategory, Record<TeamName, [string, string]>>> = {
+  apple: {
+    boys: { Cheetahs: ['Ethan', 'Luca'], Rhinos: ['Noah', 'Kai'] },
+    girls: { Cheetahs: ['Ava', 'Mila'], Rhinos: ['Zoe', 'Nia'] },
+  },
+  emerald: {
+    boys: { Cheetahs: ['Caleb', 'Milo'], Rhinos: ['Owen', 'Jude'] },
+    girls: { Cheetahs: ['Layla', 'Aria'], Rhinos: ['Nora', 'Ivy'] },
+  },
+  red: {
+    boys: { Cheetahs: ['Ryan', 'Zane'], Rhinos: ['Isaac', 'Leo'] },
+    girls: { Cheetahs: ['Chloe', 'Ruby'], Rhinos: ['Hazel', 'Esme'] },
+  },
+  yellow: {
+    boys: { Cheetahs: ['Adam', 'Ben'], Rhinos: ['Joel', 'Seth'] },
+    girls: { Cheetahs: ['Luna', 'Maya'], Rhinos: ['Elsie', 'Skye'] },
+  },
+  'year-1': {
+    boys: { Cheetahs: ['Aiden', 'Tyler'], Rhinos: ['Blake', 'Cole'] },
+    girls: { Cheetahs: ['Emma', 'Sara'], Rhinos: ['Leah', 'Nina'] },
+  },
+  'year-2': {
+    boys: { Cheetahs: ['Daniel', 'Victor'], Rhinos: ['Peter', 'Simon'] },
+    girls: { Cheetahs: ['Hannah', 'Grace'], Rhinos: ['Daisy', 'Freya'] },
+  },
+  'year-3': {
+    boys: { Cheetahs: ['Brandon', 'Julian'], Rhinos: ['Trevor', 'Marcus'] },
+    girls: { Cheetahs: ['Clara', 'Naomi'], Rhinos: ['Mabel', 'Jade'] },
+  },
+  'year-4': {
+    boys: { Cheetahs: ['Xavier', 'Adrian'], Rhinos: ['Damian', 'Kevin'] },
+    girls: { Cheetahs: ['Sophie', 'Elena'], Rhinos: ['Bianca', 'Kira'] },
+  },
+  'year-5': {
+    boys: { Cheetahs: ['Nathan', 'Gavin'], Rhinos: ['Tristan', 'Felix'] },
+    girls: { Cheetahs: ['Ariel', 'Tessa'], Rhinos: ['Lydia', 'Rhea'] },
+  },
+  'year-6': {
+    boys: { Cheetahs: ['Connor', 'Hudson'], Rhinos: ['Derek', 'Jonas'] },
+    girls: { Cheetahs: ['Phoebe', 'Iris'], Rhinos: ['Nyla', 'Selah'] },
+  },
+  'lower-primary': {
+    boys: { Cheetahs: ['Micah', 'Eli'], Rhinos: ['Riley', 'Otis'] },
+    girls: { Cheetahs: ['Piper', 'Aaliyah'], Rhinos: ['Talia', 'Keira'] },
+  },
+  'upper-primary': {
+    boys: { Cheetahs: ['Preston', 'Rowan'], Rhinos: ['Harvey', 'Quentin'] },
+    girls: { Cheetahs: ['Amara', 'Bella'], Rhinos: ['Kiara', 'Sienna'] },
+  },
+  secondary: {
+    boys: { Cheetahs: ['Zachary', 'Ian'], Rhinos: ['Roman', 'Calvin'] },
+    girls: { Cheetahs: ['Jasmine', 'Olivia'], Rhinos: ['Camila', 'Violet'] },
+  },
+};
+
 function createCompetitionContestants(className: string, gender: GenderCategory): Contestant[] {
+  const namesByGroupAndGender = CONTESTANT_NAMES_BY_CLASS[className] ?? DEFAULT_CONTESTANT_NAMES;
+  const names = namesByGroupAndGender[gender];
+
   return [
-    { id: `${className}-${gender}-cheetahs-1`, group: 'Cheetahs' },
-    { id: `${className}-${gender}-cheetahs-2`, group: 'Cheetahs' },
-    { id: `${className}-${gender}-rhinos-1`, group: 'Rhinos' },
-    { id: `${className}-${gender}-rhinos-2`, group: 'Rhinos' },
+    { id: `${className}-${gender}-cheetahs-1`, name: names.Cheetahs[0], group: 'Cheetahs' },
+    { id: `${className}-${gender}-cheetahs-2`, name: names.Cheetahs[1], group: 'Cheetahs' },
+    { id: `${className}-${gender}-rhinos-1`, name: names.Rhinos[0], group: 'Rhinos' },
+    { id: `${className}-${gender}-rhinos-2`, name: names.Rhinos[1], group: 'Rhinos' },
   ];
 }
 

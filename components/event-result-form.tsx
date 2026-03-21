@@ -99,9 +99,7 @@ export function EventResultForm({
   const getGroupColor = (group: Contestant['group']) => (group === 'Cheetahs' ? 'text-amber-600' : 'text-slate-700');
 
   const getContestantLabel = (contestant: Contestant) => {
-    const slotMatch = contestant.id.match(/-(\d+)$/);
-    const slot = slotMatch ? ` ${slotMatch[1]}` : '';
-    return `${contestant.group}${slot}`;
+    return `${contestant.name} (${contestant.group})`;
   };
 
   return (
@@ -139,8 +137,8 @@ export function EventResultForm({
             </SelectTrigger>
             <SelectContent>
               {contestants.map((contestant) => (
-                <SelectItem key={contestant.id} value={contestant.id}>
-                  <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
+                <SelectItem key={contestant.id} className="hover:bg-gray-200!" value={contestant.id}>
+                  <span className={`${getGroupColor(contestant.group)}`}>{getContestantLabel(contestant)}</span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -157,7 +155,7 @@ export function EventResultForm({
               {contestants
                 .filter((contestant) => contestant.id !== first)
                 .map((contestant) => (
-                  <SelectItem key={contestant.id} value={contestant.id}>
+                  <SelectItem key={contestant.id} value={contestant.id} className="hover:bg-gray-200!">
                     <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
                   </SelectItem>
                 ))}
@@ -176,7 +174,7 @@ export function EventResultForm({
                 {contestants
                   .filter((contestant) => contestant.id !== first && contestant.id !== second)
                   .map((contestant) => (
-                    <SelectItem key={contestant.id} value={contestant.id}>
+                    <SelectItem key={contestant.id} value={contestant.id} className="hover:bg-gray-200!">
                       <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
                     </SelectItem>
                   ))}
