@@ -80,6 +80,7 @@ export const MATURED_EVENTS: Event[] = [
 export const EARLY_EVENTS: Event[] = [
   { id: 'apple-ball-race', name: 'Ball Race', className: 'apple' },
 
+  { id: 'emerald-ice-cream-race', name: 'Ice Cream Race', className: 'emerald' },
   { id: 'emerald-20m-dash', name: '20m Dash', className: 'emerald' },
   { id: 'emerald-football-shooting', name: 'Football Shooting', className: 'emerald' },
 

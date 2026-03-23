@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { calculatePoints, type Contestant, type Event, type GenderCategory, type ScoredEventResult } from '@/lib/data';
+import { persistEventResult } from '@/lib/supabase/results';
 
 interface EventResultFormProps {
   event: Event;
@@ -12,7 +13,7 @@ interface EventResultFormProps {
   contestants: Contestant[];
   existingResult?: ScoredEventResult;
   module?: 'early' | 'matured';
-  onSubmit: (result: ScoredEventResult) => void;
+  onSubmit: (result: ScoredEventResult) => void | Promise<void>;
 }
 
 export function EventResultForm({
@@ -27,6 +28,7 @@ export function EventResultForm({
   const [second, setSecond] = useState('');
   const [third, setThird] = useState('');
   const [saveMessageVisible, setSaveMessageVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!existingResult) {
@@ -41,7 +43,7 @@ export function EventResultForm({
     setThird(existingResult.placements.third ?? '');
   }, [existingResult]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!first || !second || !third) {
       alert('Please select 1st, 2nd and 3rd place.');
       return;
@@ -61,7 +63,7 @@ export function EventResultForm({
       event.id,
     );
 
-    onSubmit({
+    const scoredResult: ScoredEventResult = {
       eventId: event.id,
       className: event.className,
       eventName: event.name,
@@ -69,9 +71,19 @@ export function EventResultForm({
       placements: { first, second, third },
       cheetahsPoints,
       rhinosPoints,
-    });
+    };
 
-    setSaveMessageVisible(true);
+    setIsSaving(true);
+    try {
+      await persistEventResult({ module, result: scoredResult });
+      await onSubmit(scoredResult);
+      setSaveMessageVisible(true);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save result to the database.';
+      alert(message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const genderLabel = gender === 'boys' ? 'Boys' : 'Girls';
@@ -147,8 +159,8 @@ export function EventResultForm({
         </div>
       </div>
 
-      <Button onClick={handleSubmit} disabled={!canSubmit} className="w-full" size="sm">
-        {existingResult ? 'Update Result' : 'Save Result'}
+      <Button onClick={handleSubmit} disabled={!canSubmit || isSaving} className="w-full" size="sm">
+        {isSaving ? 'Saving...' : existingResult ? 'Update Result' : 'Save Result'}
       </Button>
 
       {saveMessageVisible && <p className="text-xs text-emerald-600">Result saved. Team points updated.</p>}
