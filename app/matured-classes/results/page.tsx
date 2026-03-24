@@ -20,9 +20,9 @@ const GENDERS: GenderCategory[] = ['boys', 'girls'];
 
 export default function MaturedResultsPage() {
   const { results } = useMaturedResults();
-  const formatContestant = (name?: string, group?: string) => {
-    if (!name || !group) return 'N/A';
-    return `${name} (${group})`;
+  const formatContestant = (group?: string) => {
+    if (!group) return 'N/A';
+    return group;
   };
 
   const totals = useMemo(() => calculateTotalPoints(results), [results]);
@@ -175,19 +175,19 @@ export default function MaturedResultsPage() {
                                   <p className="text-sm text-muted-foreground">
                                     1st:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {formatContestant(first?.name, first?.group)}
+                                      {formatContestant(first?.group)}
                                     </span>
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     2nd:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {formatContestant(second?.name, second?.group)}
+                                      {formatContestant(second?.group)}
                                     </span>
                                   </p>
                                   <p className="text-sm text-muted-foreground">
                                     3rd:{' '}
                                     <span className="font-semibold text-foreground">
-                                      {third ? formatContestant(third.name, third.group) : 'Not recorded'}
+                                      {third ? formatContestant(third.group) : 'Not recorded'}
                                     </span>
                                   </p>
                                   <p className="text-sm font-semibold text-foreground">
