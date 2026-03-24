@@ -93,7 +93,7 @@ export function EventResultForm({
   const getGroupColor = (group: Contestant['group']) => (group === 'Cheetahs' ? 'text-amber-600' : 'text-slate-700');
 
   const getContestantLabel = (contestant: Contestant) => {
-    return `${contestant.name} (${contestant.group})`;
+    return contestant.group;
   };
 
   return (
