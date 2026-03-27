@@ -19,7 +19,7 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Early Classes Module */}
-          <Link href="/early-classes">
+          <Link href="/early">
             <Card className="h-full p-8 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/50 bg-card">
               <div className="space-y-6 h-full flex flex-col justify-between">
                 <div className="space-y-4">
@@ -51,7 +51,7 @@ export default function Home() {
           </Link>
 
           {/* Matured Classes Module */}
-          <Link href="/matured-classes">
+          <Link href="/matured">
             <Card className="h-full p-8 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/50 bg-card">
               <div className="space-y-6 h-full flex flex-col justify-between">
                 <div className="space-y-4">
