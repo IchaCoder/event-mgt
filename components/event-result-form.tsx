@@ -29,7 +29,7 @@ export function EventResultForm({
   const [third, setThird] = useState('');
   const [saveMessageVisible, setSaveMessageVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const isCaptureTheBallEvent = event.id.includes('capture-the-ball');
+  const isCaptureTheBallEvent = event.id.includes('capture-the-ball') || event.id.includes('relay');
 
   useEffect(() => {
     if (!existingResult) {
