@@ -51,7 +51,7 @@ export default function Home() {
           </Link>
 
           {/* Matured Classes Module */}
-          <Link href="/matured">
+          <Link href="/matured/results">
             <Card className="h-full p-8 hover:shadow-lg transition-all cursor-pointer border-primary/20 hover:border-primary/50 bg-card">
               <div className="space-y-6 h-full flex flex-col justify-between">
                 <div className="space-y-4">
