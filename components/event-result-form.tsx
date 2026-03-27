@@ -29,6 +29,7 @@ export function EventResultForm({
   const [third, setThird] = useState('');
   const [saveMessageVisible, setSaveMessageVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const isCaptureTheBallEvent = event.id.includes('capture-the-ball');
 
   useEffect(() => {
     if (!existingResult) {
@@ -44,19 +45,26 @@ export function EventResultForm({
   }, [existingResult]);
 
   const handleSubmit = async () => {
-    if (!first || !second || !third) {
+    if (!first || !second) {
+      alert('Please select 1st and 2nd place.');
+      return;
+    }
+
+    if (!isCaptureTheBallEvent && !third) {
       alert('Please select 1st, 2nd and 3rd place.');
       return;
     }
 
-    const selectedPlacements = [first, second, third].filter(Boolean);
+    const selectedPlacements = isCaptureTheBallEvent ? [first, second] : [first, second, third].filter(Boolean);
     if (new Set(selectedPlacements).size !== selectedPlacements.length) {
       alert('Each contestant can only appear once in placements.');
       return;
     }
 
+    const thirdPlacement = isCaptureTheBallEvent ? undefined : third;
+
     const { cheetahsPoints, rhinosPoints } = calculatePoints(
-      { first, second, third },
+      { first, second, third: thirdPlacement },
       event.className,
       gender,
       module,
@@ -68,7 +76,7 @@ export function EventResultForm({
       className: event.className,
       eventName: event.name,
       gender,
-      placements: { first, second, third },
+      placements: { first, second, third: thirdPlacement },
       cheetahsPoints,
       rhinosPoints,
     };
@@ -87,7 +95,7 @@ export function EventResultForm({
   };
 
   const genderLabel = gender === 'boys' ? 'Boys' : 'Girls';
-  const canSubmit = Boolean(first && second && third);
+  const canSubmit = isCaptureTheBallEvent ? Boolean(first && second) : Boolean(first && second && third);
   const contestantsPerGroup = contestants.length / 2;
 
   const getGroupColor = (group: Contestant['group']) => (group === 'Cheetahs' ? 'text-amber-600' : 'text-slate-700');
@@ -140,23 +148,25 @@ export function EventResultForm({
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <label className="text-xs text-muted-foreground">3rd Place</label>
-          <Select value={third} onValueChange={setThird}>
-            <SelectTrigger className="bg-input text-foreground">
-              <SelectValue placeholder="Select group" />
-            </SelectTrigger>
-            <SelectContent>
-              {contestants
-                .filter((contestant) => contestant.id !== first && contestant.id !== second)
-                .map((contestant) => (
-                  <SelectItem key={contestant.id} value={contestant.id} className="hover:bg-gray-200!">
-                    <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {!isCaptureTheBallEvent && (
+          <div className="space-y-2">
+            <label className="text-xs text-muted-foreground">3rd Place</label>
+            <Select value={third} onValueChange={setThird}>
+              <SelectTrigger className="bg-input text-foreground">
+                <SelectValue placeholder="Select group" />
+              </SelectTrigger>
+              <SelectContent>
+                {contestants
+                  .filter((contestant) => contestant.id !== first && contestant.id !== second)
+                  .map((contestant) => (
+                    <SelectItem key={contestant.id} value={contestant.id} className="hover:bg-gray-200!">
+                      <span className={getGroupColor(contestant.group)}>{getContestantLabel(contestant)}</span>
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <Button onClick={handleSubmit} disabled={!canSubmit || isSaving} className="w-full" size="sm">
